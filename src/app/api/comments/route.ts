@@ -29,12 +29,27 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'postId/content required' }, { status: 400 })
     }
 
+    const normalizedPostId: string | number = /^\d+$/.test(String(body.postId))
+      ? Number(body.postId)
+      : String(body.postId)
+
+    const postExists = await payload.findByID({
+      collection: 'posts',
+      id: normalizedPostId,
+      depth: 0,
+      disableErrors: true,
+    })
+
+    if (!postExists) {
+      return NextResponse.json({ error: 'Post not found' }, { status: 404 })
+    }
+
     const doc = await payload.create({
       collection: 'comments',
       overrideAccess: true,
       data: {
         content: body.content,
-        post: body.postId,
+        post: normalizedPostId,
         author: user?.id,
         parentComment: body.parentCommentId || undefined,
       },
@@ -42,7 +57,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true, id: doc.id })
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Create comment failed'
+    const message = error instanceof Error ? error.message : String(error || 'Create comment failed')
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }
