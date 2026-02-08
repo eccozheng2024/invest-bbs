@@ -31,6 +31,7 @@ export async function POST(req: NextRequest) {
 
     const doc = await payload.create({
       collection: 'posts',
+      overrideAccess: true,
       data: {
         title: body.title,
         content: body.content,
@@ -45,7 +46,8 @@ export async function POST(req: NextRequest) {
     })
 
     return NextResponse.json({ success: true, id: doc.id })
-  } catch {
-    return NextResponse.json({ error: 'Create post failed' }, { status: 500 })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Create post failed'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }
