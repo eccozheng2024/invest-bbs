@@ -13,6 +13,11 @@ export async function POST(req: NextRequest) {
       const body = await req.json()
       userId = body?.userId || ''
       adminKey = body?.adminKey || ''
+    } else if (contentType.includes('application/x-www-form-urlencoded')) {
+      const raw = await req.text()
+      const params = new URLSearchParams(raw)
+      userId = params.get('userId') || ''
+      adminKey = params.get('adminKey') || ''
     } else {
       const formData = await req.formData()
       userId = String(formData.get('userId') || '')
@@ -29,14 +34,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
+    const normalizedId: string | number = /^\d+$/.test(userId) ? Number(userId) : userId
+
     await payload.update({
       collection: 'users',
-      id: userId,
+      id: normalizedId,
       data: { status: 'rejected' },
     })
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    return NextResponse.json({ error: 'Reject failed' }, { status: 500 })
+    const message = error instanceof Error ? error.message : 'Reject failed'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }
