@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
   try {
     const payload = await getPayload({ config })
     const auth = await payload.auth({ headers: req.headers })
-    let user = auth.user as { id?: string; email?: string } | null
+    let user = auth.user as { id?: string; email?: string; status?: string } | null
 
     if (!user?.id) {
       const email = req.headers.get('x-user-email') || ''
@@ -20,6 +20,10 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    if (!user?.id || user.status !== 'approved') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
     const body = await req.json()
     if (!body?.postId || !body?.content) {
       return NextResponse.json({ error: 'postId/content required' }, { status: 400 })
@@ -27,6 +31,7 @@ export async function POST(req: NextRequest) {
 
     const doc = await payload.create({
       collection: 'comments',
+      overrideAccess: true,
       data: {
         content: body.content,
         post: body.postId,
@@ -36,7 +41,8 @@ export async function POST(req: NextRequest) {
     })
 
     return NextResponse.json({ success: true, id: doc.id })
-  } catch {
-    return NextResponse.json({ error: 'Create comment failed' }, { status: 500 })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Create comment failed'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }
