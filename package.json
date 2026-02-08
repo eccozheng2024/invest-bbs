@@ -1,0 +1,44 @@
+{
+  "name": "invest-bbs",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "ai:ingest:once": "tsx scripts/ai-ingest.ts"
+  },
+  "dependencies": {
+    "@payloadcms/db-postgres": "latest",
+    "@payloadcms/db-sqlite": "^3.75.0",
+    "@payloadcms/next": "latest",
+    "@payloadcms/richtext-lexical": "latest",
+    "@payloadcms/storage-s3": "latest",
+    "@payloadcms/ui": "latest",
+    "cli-color": "^2.0.4",
+    "cross-env": "^7.0.3",
+    "graphql": "^16.8.1",
+    "next": "^15.0.0",
+    "payload": "latest",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "sharp": "0.32.6"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "@types/node": "^20.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.2.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0"
+  },
+  "engines": {
+    "node": ">=20.0.0 <24"
+  },
+  "packageManager": "pnpm@9.0.0"
+}
