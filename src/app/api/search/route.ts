@@ -21,7 +21,8 @@ export async function GET(req: NextRequest) {
     })
 
     return NextResponse.json({ docs: result.docs })
-  } catch {
-    return NextResponse.json({ error: 'Search failed' }, { status: 500 })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Search failed'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }

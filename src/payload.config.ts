@@ -29,6 +29,7 @@ export default buildConfig({
   },
   db: process.env.DATABASE_URI
     ? postgresAdapter({
+        push: true,
         pool: {
           connectionString: process.env.DATABASE_URI,
         },
